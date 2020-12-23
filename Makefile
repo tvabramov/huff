@@ -1,17 +1,22 @@
 CXX=g++
 CXXFLAGS=-I. -std=c++14
 DEPS = worker.h
-OBJ = worker.o huff.o 
+OBJ_COMMON = worker.o
+OBJ_ENCODE = encode.o
+OBJ_DECODE = decode.o
 
-all: huff
+all: encode decode
 
 %.o: %.c $(DEPS)
 	$(CXX) -c -o $@ $< $(CXXFLAGS)
 
-huff: $(OBJ)
+encode: $(OBJ_COMMON) $(OBJ_ENCODE)
 	$(CXX) -o $@ $^ $(CXXFLAGS)
-	
+
+decode: $(OBJ_COMMON) $(OBJ_DECODE)
+	$(CXX) -o $@ $^ $(CXXFLAGS)
+
 .PHONY: clean
 	
 clean:
-	rm *.o huff
+	rm *.o encode decode
