@@ -21,11 +21,12 @@ unordered_map<char, double> calcFrequency(ifstream& is) {
 
 // TODO: check with ugly tree (Fibonachi case).
 TreeNode* freq2HaffnamTree(const unordered_map<char, double>& freq) {
-  multimap<double, TreeNode*> m;
+  // Use pair <priority - char> as a key for unambiguous ordering of nodes (in the case of same priority).
+  multimap<pair<double, char>, TreeNode*> m;
   // cout << "freq size = " << freq.size() << endl;
   transform(freq.begin(), freq.end(), inserter(m, m.end()), [](const auto& p) {
     TreeNode* node = new TreeNode(p.second /* priority */, p.first /* val */);
-    return make_pair(p.second, std::move(node));
+    return make_pair(make_pair(p.second, p.first), std::move(node));
   });
   // cout << "m size = " << m.size() << endl;
 
@@ -36,13 +37,13 @@ TreeNode* freq2HaffnamTree(const unordered_map<char, double>& freq) {
     node->left_ = it1->second;
     node->right_ = it2->second;
     node->val_ = nullptr;
-    node->priority_ = it1->first + it2->first;
+    node->priority_ = it1->first.first + it2->first.first;
     // cout << "get pr = " << it1->first << " and " << it2->first << ", size = "
     // << m.size() << endl;
 
     m.erase(it1);
     m.erase(it2);
-    m.insert(make_pair(node->priority_, node));
+    m.insert(make_pair(make_pair(node->priority_, 0), node));
   }
 
   // fictive node
@@ -51,7 +52,7 @@ TreeNode* freq2HaffnamTree(const unordered_map<char, double>& freq) {
     node->left_ = m.begin()->second;
     node->right_ = nullptr;
     node->val_ = nullptr;
-    node->priority_ = m.begin()->first + 1.0;
+    node->priority_ = m.begin()->first.first + 1.0;
 
     return node;
   }
@@ -99,6 +100,8 @@ void encode(std::ifstream& is, std::ofstream& os) {
 
   auto table = haffnamTree2EncTable(tree);
 
+  delete tree;
+
   {
     auto buf = freq.size();
     os.write(reinterpret_cast<const char*>(&buf), sizeof(buf));
@@ -138,12 +141,15 @@ void encode(std::ifstream& is, std::ofstream& os) {
     os.write(&buf, sizeof(buf));
     cout << "<size>";
     buf = 0;
-    while (!res.empty()) {
-      cout << res.front() ? "1" : "0";
-      if (res.front()) buf &= 1;
-      buf << 1;
-      res.erase(res.begin());
+    for (int i = 0; i < 8; ++i) {
+      buf <<= 1;
+      if (!res.empty()) {
+        cout << res.front() ? "1" : "0";
+        if (res.front()) buf |= 1;
+        res.erase(res.begin());
+      }
     }
+    cout << "LAST BYTE = " << (int)buf << endl;
     os.write(&buf, sizeof(buf));
   }
 
@@ -200,6 +206,7 @@ void decode(std::ifstream& is, std::ofstream& os) {
           node = node->left_;
         }
         if (node->val_) {
+          cout << "DECODED letter " << *node->val_ << endl;
           os.write(node->val_, sizeof(*node->val_));
           node = tree;
         }
@@ -211,10 +218,11 @@ void decode(std::ifstream& is, std::ofstream& os) {
   // DCKECK(buffer.size() == 2);
   char last_byte_size = buffer.front();
   char last_byte = buffer.back();
+cout << "LAST = " << (int)last_byte << endl;
   for (int i = 0; i < last_byte_size; ++i) {
-    bool bit = ((ch & (1 << 7)) != 0) ? true : false;
+    bool bit = ((last_byte & (1 << 7)) != 0) ? true : false;
     cout << bit ? "1" : "0";
-    ch <<= 1;
+    last_byte <<= 1;
 
     if (bit) {
       // DCHECK(node->right)
@@ -224,6 +232,7 @@ void decode(std::ifstream& is, std::ofstream& os) {
       node = node->left_;
     }
     if (node->val_) {
+      cout << "DECODED letter " << *node->val_ << endl;
       os.write(node->val_, sizeof(*node->val_));
       node = tree;
     }

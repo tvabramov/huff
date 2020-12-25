@@ -14,21 +14,23 @@ def synthetic():
         result_decode = env.run('..\\decode', 'encoded.dat', 'decoded.dat')
         assert filecmp.cmp('./test_data/' + filename, './scratch/decoded.dat')
         print(filename + " is OK")
-    print("Tests with synthetic data passed")
+    print("All tests with synthetic data passed")
 
 #TODO: ordinary books, images. Also check that encoded file is smaller than orginal.
 def ordinary():
-    print("Tests with damaged encoded data passed")
+    print("All tests with damaged encoded data passed")
 
 #TODO: damaged encoded with unreadable table.
 def damaged():
-    print("Tests with damaged encoded data passed")
+    print("All tests with damaged encoded data passed")
+
 #TODO: very large file (that can not be in stored in usual way) test, check perfomance also.
 def very_large():
-    print("Tests with very large input data passed")
+    print("All tests with very large input data passed")
+
 #TODO: large file test with Fibonachi frequences.
 def fibonachi():
-    print("Tests with inconvenient input data passed")
+    print("All tests with inconvenient input data passed")
 
 if __name__ == "__main__":
     synthetic()

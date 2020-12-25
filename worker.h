@@ -5,6 +5,8 @@
 #include <unordered_map>
 #include <vector>
 
+#include <iostream>
+
 struct TreeNode {
   TreeNode *left_, *right_;
   double priority_;
@@ -19,6 +21,7 @@ struct TreeNode {
 
   // TODO: test it by drmemory
   ~TreeNode() {
+    std::cout << "Node deleted!";
     if (val_) delete val_;
     if (left_) delete left_;
     if (right_) delete right_;
