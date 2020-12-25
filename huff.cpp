@@ -1,33 +1,30 @@
 #include <cstdlib>
-#include <iostream>
 #include <fstream>
+#include <iostream>
 #include <vector>
 
 #include "worker.h"
 
 using namespace std;
 
-int main(int argc, char** argv)
-{
+int main(int argc, char** argv) {
   std::ifstream is("test.txt", ifstream::binary);
-  if (!is) 
-    return EXIT_FAILURE;
-	
+  if (!is) return EXIT_FAILURE;
+
   auto freq = calcFrequency(is);
 
-  for (const auto &p : freq) {
+  for (const auto& p : freq) {
     cout << p.first << " = " << (int)p.first << ", count " << p.second << endl;
   }
 
   TreeNode* tree = freq2HaffnamTree(freq);
 
   auto table = haffnamTree2EncTable(tree);
-  
+
   cout << endl;
-  for (const auto &p : table) {
+  for (const auto& p : table) {
     cout << p.first << " = " << (int)p.first << ", code ";
-    for (auto bt : p.second)
-      cout << bt;
+    for (auto bt : p.second) cout << bt;
     cout << endl;
   }
 
@@ -47,7 +44,7 @@ int main(int argc, char** argv)
   is2.close();
   os2.close();
   /*std::vector<bool> encoded = encode(is, os, table);
-  
+
   cout << "CODE = ";
   for (auto b : encoded) {
     cout << (b ? "1" : "0");

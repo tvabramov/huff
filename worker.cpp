@@ -1,14 +1,13 @@
-#include <map>
-#include <algorithm>
-#include <deque>
 #include "worker.h"
 
+#include <algorithm>
+#include <deque>
 #include <iostream>
+#include <map>
 using namespace std;
 
 unordered_map<char, double> calcFrequency(ifstream& is) {
-  if (!is)
-    return {};
+  if (!is) return {};
   is.seekg(0, is.beg);
   unordered_map<char, double> freq;
   char ch;
@@ -23,13 +22,13 @@ unordered_map<char, double> calcFrequency(ifstream& is) {
 // TODO: check with ugly tree (Fibonachi case).
 TreeNode* freq2HaffnamTree(const unordered_map<char, double>& freq) {
   multimap<double, TreeNode*> m;
-//cout << "freq size = " << freq.size() << endl;
-  transform(freq.begin(), freq.end(), inserter(m, m.end()), [](const auto &p){
+  // cout << "freq size = " << freq.size() << endl;
+  transform(freq.begin(), freq.end(), inserter(m, m.end()), [](const auto& p) {
     TreeNode* node = new TreeNode(p.second /* priority */, p.first /* val */);
     return make_pair(p.second, std::move(node));
   });
-//cout << "m size = " << m.size() << endl;
-  
+  // cout << "m size = " << m.size() << endl;
+
   while (m.size() > 1) {
     auto it1 = m.begin();
     auto it2 = next(m.begin());
@@ -38,7 +37,8 @@ TreeNode* freq2HaffnamTree(const unordered_map<char, double>& freq) {
     node->right_ = it2->second;
     node->val_ = nullptr;
     node->priority_ = it1->first + it2->first;
-    //cout << "get pr = " << it1->first << " and " << it2->first << ", size = " << m.size() << endl;
+    // cout << "get pr = " << it1->first << " and " << it2->first << ", size = "
+    // << m.size() << endl;
 
     m.erase(it1);
     m.erase(it2);
@@ -59,7 +59,9 @@ TreeNode* freq2HaffnamTree(const unordered_map<char, double>& freq) {
   return m.empty() ? nullptr : m.begin()->second;
 }
 
-void haffnamTree2EncTableCore(TreeNode* head, unordered_map<char, vector<bool>>& table, vector<bool> path) {
+void haffnamTree2EncTableCore(TreeNode* head,
+                              unordered_map<char, vector<bool>>& table,
+                              vector<bool> path) {
   if (head) {
     if (head->val_) {
       // DCHECK(!head->left && !head->right)
@@ -87,8 +89,8 @@ unordered_map<char, vector<bool>> haffnamTree2EncTable(TreeNode* head) {
 }
 
 void encode(std::ifstream& is, std::ofstream& os) {
- // if (!is || !os) 
- //   return;
+  // if (!is || !os)
+  //   return;
   is.clear();
   is.seekg(0, is.beg);
   auto freq = calcFrequency(is);
@@ -99,10 +101,10 @@ void encode(std::ifstream& is, std::ofstream& os) {
 
   {
     auto buf = freq.size();
-    os.write(reinterpret_cast<const char *>(&buf), sizeof(buf));
-    for (const auto &p : freq) {
-      os.write(reinterpret_cast<const char *>(&p.first), sizeof(p.first));
-      os.write(reinterpret_cast<const char *>(&p.second), sizeof(p.second));
+    os.write(reinterpret_cast<const char*>(&buf), sizeof(buf));
+    for (const auto& p : freq) {
+      os.write(reinterpret_cast<const char*>(&p.first), sizeof(p.first));
+      os.write(reinterpret_cast<const char*>(&p.second), sizeof(p.second));
     }
   }
 
@@ -110,7 +112,7 @@ void encode(std::ifstream& is, std::ofstream& os) {
   is.seekg(0, is.beg);
   char ch;
   std::vector<bool> res;
-cout << "CODE: ";
+  cout << "CODE: ";
   while (is.read(&ch, sizeof(ch))) {
     auto it = table.find(ch);
     // DCHECK(it != table.end())
@@ -123,8 +125,7 @@ cout << "CODE: ";
       for (int i = 0; i < 8; ++i) {
         buf <<= 1;
         cout << res.front() ? "1" : "0";
-        if (res.front())
-          buf |= 1;
+        if (res.front()) buf |= 1;
         res.erase(res.begin());
       }
       cout << " = " << (int)buf << " ";
@@ -135,12 +136,11 @@ cout << "CODE: ";
   {
     char buf = res.size();
     os.write(&buf, sizeof(buf));
-cout << "<size>";
+    cout << "<size>";
     buf = 0;
     while (!res.empty()) {
       cout << res.front() ? "1" : "0";
-      if (res.front())
-        buf &= 1;
+      if (res.front()) buf &= 1;
       buf << 1;
       res.erase(res.begin());
     }
@@ -152,40 +152,37 @@ cout << "<size>";
 }
 
 void decode(std::ifstream& is, std::ofstream& os) {
-
   is.clear();
   is.seekg(0, is.beg);
 
   std::unordered_map<char, double> freq;
   {
     size_t table_size;
-    if (!is.read(reinterpret_cast<char *>(&table_size), sizeof(table_size)))
+    if (!is.read(reinterpret_cast<char*>(&table_size), sizeof(table_size)))
       return;
     cout << "DECODE: table_size = " << table_size;
 
     char key;
     double val;
     for (auto i = 0; i < table_size; ++i) {
-      if (!is.read(reinterpret_cast<char *>(&key), sizeof(key)))
-        return;
-      if (!is.read(reinterpret_cast<char *>(&val), sizeof(val)))
-        return;
+      if (!is.read(reinterpret_cast<char*>(&key), sizeof(key))) return;
+      if (!is.read(reinterpret_cast<char*>(&val), sizeof(val))) return;
       freq.insert(make_pair(key, val));
     }
   }
 
   cout << endl << "DECODE:" << endl;
-  for (const auto &p : freq) {
+  for (const auto& p : freq) {
     cout << p.first << " = " << (int)p.first << ", count " << p.second << endl;
   }
 
   TreeNode* tree = freq2HaffnamTree(freq);
 
   deque<char> buffer;
-  auto *node = tree;
+  auto* node = tree;
   char ch;
   while (is.read(&ch, sizeof(ch))) {
-    //cout << (int)ch << " ";
+    // cout << (int)ch << " ";
     buffer.push_back(ch);
     if (buffer.size() > 2) {
       ch = buffer.front();
@@ -264,5 +261,7 @@ void decode(std::ifstream& is, std::ofstream& os) {
 Пустой вход
 Односимвольный вход
 Частоты Фибоначчи
+Equal freq
 
+Very big files
 */
