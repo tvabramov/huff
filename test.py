@@ -1,4 +1,4 @@
-# TODO: optimize file pathing in TestFileEnvironment for different platforms
+# TODO: optimize file pathing in TestFileEnvironment for different platforms.
 from scripttest import TestFileEnvironment
 import filecmp
 import os
@@ -6,7 +6,7 @@ import os
 env = TestFileEnvironment('./scratch')
 
 # Just checks that encoded-decoded file is equal to original one.
-def ordinary_cases():
+def synthetic():
     env.clear()
     for filename in os.listdir('./test_data'):
         print("Testing file: " + filename + " ...")
@@ -14,8 +14,26 @@ def ordinary_cases():
         result_decode = env.run('..\\decode', 'encoded.dat', 'decoded.dat')
         assert filecmp.cmp('./test_data/' + filename, './scratch/decoded.dat')
         print(filename + " is OK")
-#damaged encoded
+    print("Tests with synthetic data passed")
+
+#TODO: ordinary books, images. Also check that encoded file is smaller than orginal.
+def ordinary():
+    print("Tests with damaged encoded data passed")
+
+#TODO: damaged encoded with unreadable table.
+def damaged():
+    print("Tests with damaged encoded data passed")
+#TODO: very large file (that can not be in stored in usual way) test, check perfomance also.
+def very_large():
+    print("Tests with very large input data passed")
+#TODO: large file test with Fibonachi frequences.
+def fibonachi():
+    print("Tests with inconvenient input data passed")
 
 if __name__ == "__main__":
-    ordinary_cases()
+    synthetic()
+    ordinary()
+    damaged()
+    very_large()
+    fibonachi()
     print("Everything passed")
