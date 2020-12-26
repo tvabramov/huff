@@ -51,7 +51,7 @@ TreeNode* freq2HaffnamTree(const unordered_map<char, long long>& freq) {
   multimap<pair<long long, char>, TreeNode*> m;
   transform(freq.begin(), freq.end(), inserter(m, m.end()), [](const auto& p) {
     TreeNode* node = new TreeNode(p.second /* priority */, p.first /* val */);
-    return make_pair(make_pair(p.second, p.first), std::move(node));
+    return make_pair(make_pair(p.second, p.first), move(node));
   });
 
   while (m.size() > 1) {
@@ -146,7 +146,7 @@ bool encode(const char* ifn, const char* ofn) {
   is.clear();
   is.seekg(0, is.beg);
   char ch;
-  std::vector<bool> res;
+  deque<bool> res;
   while (is.read(&ch, sizeof(ch))) {
     auto it = table.find(ch);
     assert(it != table.end());
@@ -159,7 +159,7 @@ bool encode(const char* ifn, const char* ofn) {
       for (int i = 0; i < 8; ++i) {
         buf <<= 1;
         if (res.front()) buf |= 1;
-        res.erase(res.begin());
+        res.pop_front();
       }
       os.write(&buf, sizeof(buf));
     }
@@ -173,7 +173,7 @@ bool encode(const char* ifn, const char* ofn) {
       buf <<= 1;
       if (!res.empty()) {
         if (res.front()) buf |= 1;
-        res.erase(res.begin());
+        res.pop_front();
       }
     }
     os.write(&buf, sizeof(buf));
@@ -197,7 +197,7 @@ bool decode(const char* ifn, const char* ofn) {
     return false;
   }
 
-  std::unordered_map<char, long long> freq;
+  unordered_map<char, long long> freq;
   {
     size_t table_size;
     if (!is.read(reinterpret_cast<char*>(&table_size), sizeof(table_size))) {
