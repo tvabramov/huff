@@ -1,9 +1,6 @@
-#include <cstdlib>
-#include <fstream>
 #include <iostream>
-#include <vector>
 
-#include "worker.h"
+#include "huff.h"
 
 using namespace std;
 
@@ -15,22 +12,5 @@ int main(int argc, char** argv) {
     return EXIT_FAILURE;
   }
 
-  ifstream is(argv[1] /* input_file_name */, ifstream::binary);
-  if (!is) {
-    cerr << "Cannot open input file: " << argv[0] << endl;
-    return EXIT_FAILURE;
-  }
-
-  ofstream os(argv[2] /* output_file_name */, ofstream::binary);
-  if (!is) {
-    cerr << "Cannot open output file: " << argv[1] << endl;
-    return EXIT_FAILURE;
-  }
-
-  decode(is, os);
-
-  is.close();
-  os.close();
-
-  return EXIT_SUCCESS;
+  return huff::decode(argv[1], argv[2]) ? EXIT_SUCCESS : EXIT_FAILURE;
 }

@@ -1,3 +1,0 @@
-Add readme.md
-Add ordinary test - add some books
-Add test for damaged decoded - ~inf header sizes.

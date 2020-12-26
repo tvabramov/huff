@@ -1,7 +1,7 @@
 CXX=g++
 CXXFLAGS=-I. -std=c++14
-DEPS = worker.h
-OBJ_COMMON = worker.o
+DEPS = huff.h
+OBJ_COMMON = huff.o
 OBJ_ENCODE = encode.o
 OBJ_DECODE = decode.o
 
@@ -17,6 +17,9 @@ decode: $(OBJ_COMMON) $(OBJ_DECODE)
 	$(CXX) -o $@ $^ $(CXXFLAGS)
 
 .PHONY: clean
-	
+
+test: all
+	python test.py
+
 clean:
 	rm *.o encode decode
