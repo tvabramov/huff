@@ -154,7 +154,7 @@ bool encode(const char* ifn, const char* ofn) {
     copy(code.begin(), code.end(), back_inserter(res));
     // TODO: try at least word-size bulk writing.
     // TODO: refact this ugly code.
-    if (res.size() >= sizeof(char) * 8) {
+    while (res.size() >= sizeof(char) * 8) {
       char buf = 0;
       for (int i = 0; i < 8; ++i) {
         buf <<= 1;
@@ -167,6 +167,7 @@ bool encode(const char* ifn, const char* ofn) {
 
   {
     char buf = res.size();
+    assert(buf < 8);
     os.write(&buf, sizeof(buf));
     buf = 0;
     for (int i = 0; i < 8; ++i) {
@@ -179,7 +180,7 @@ bool encode(const char* ifn, const char* ofn) {
     os.write(&buf, sizeof(buf));
   }
 
-  os.flush();
+  os.close();
 
   return true;
 }
@@ -266,6 +267,8 @@ bool decode(const char* ifn, const char* ofn) {
   }
 
   delete tree;
+
+  os.close();
 
   return true;
 }
