@@ -19,7 +19,7 @@ struct TreeNode {
   long long priority_;
   char* val_;  // as optional;
 
-  TreeNode() : left_(nullptr), right_(nullptr), priority_(0.0), val_(nullptr) {}
+  TreeNode() : left_(nullptr), right_(nullptr), priority_(0), val_(nullptr) {}
   explicit TreeNode(long long priority, char val)
       : left_(nullptr),
         right_(nullptr),
@@ -70,7 +70,7 @@ TreeNode* freq2HaffnamTree(const unordered_map<char, long long>& freq) {
   if (freq.size() == 1) {
     TreeNode* node =
         new TreeNode(m.begin()->second /* left */, nullptr /* right */,
-                     m.begin()->first.first + 1.0 /* priority */);
+                     m.begin()->first.first + 1 /* priority */);
     return node;
   }
 
